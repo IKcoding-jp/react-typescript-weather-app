@@ -2,6 +2,7 @@ import { useState } from "react";
 import Title from "./components/Title";
 import Form from "./components/Form";
 import Results from "./components/Results";
+import Loading from "./components/Loading";
 
 type ResultState = {
   country: string;
@@ -12,8 +13,8 @@ type ResultState = {
 };
 
 const App = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [city, setCity] = useState<string>("");
-
   const [results, setResults] = useState<ResultState>({
     country: "",
     cityName: "",
@@ -24,6 +25,7 @@ const App = () => {
 
   const getWeather = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     fetch(
       `https://api.weatherapi.com/v1/current.json?key=${import.meta.env.VITE_WEATHER_API_KEY}&q=${city}&aqi=no`,
     )
@@ -36,6 +38,7 @@ const App = () => {
           conditionText: data.current.condition.text,
           icon: data.current.condition.icon,
         });
+        setLoading(false);
       });
   };
 
@@ -44,7 +47,7 @@ const App = () => {
       <div className="container">
         <Title />
         <Form setCity={setCity} getWeather={getWeather} />
-        <Results results={results} />
+        {loading ? <Loading /> : <Results results={results} />}
       </div>
     </div>
   );
